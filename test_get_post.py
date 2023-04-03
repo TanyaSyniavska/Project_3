@@ -39,7 +39,8 @@ def test_create_address(basic_auth):
     added_element = ET.fromstring(response_add_address.text)
     assert added_element.find(".//id").text is not None
 
-# test_3_post_new_currency
+# test3, create new currency
+
 @pytest.mark.usefixtures("basic_auth")
 def test_create_currency(basic_auth):
     url_currency = 'http://164.92.218.36:8080/api/currencies'
@@ -49,12 +50,12 @@ def test_create_currency(basic_auth):
                 <names>
                     <language id="1" xlink:href="http://164.92.218.36:8080/api/languages/1" format="isUnsignedId"></language>
                 </names>
-                <name notFilterable="true" required="true" maxSize="255" format="isGenericName">Ларі</name>
+                <name notFilterable="true" required="true" maxSize="255" format="isGenericName">jdrhdgs</name>
                 <symbol maxSize="255">
                     <language id="1" xlink:href="http://164.92.218.36:8080/api/languages/1" format="isUnsignedId"></language>
                 </symbol> 
-                <iso_code required="true" maxSize="3" format="isLanguageIsoCode">GEL</iso_code>
-                <conversion_rate required="true" format="isUnsignedFloat">3.10</conversion_rate>
+                <iso_code required="true" maxSize="3" format="isLanguageIsoCode">JPI</iso_code>
+                <conversion_rate required="true" format="isUnsignedFloat">7.985</conversion_rate>
             </currency>
         </prestashop>
     """
@@ -63,17 +64,40 @@ def test_create_currency(basic_auth):
 
     response_add_currency = requests.post(url_currency, data=xml_data_currency, headers=headers, auth=basic_auth)
     assert response_add_currency.status_code == 201
-    
-    added_currency = ET.fromstring(response_add_currency.text)
-    new_currency_id = added_currency.find(".//id").text
-    assert added_currency.find(".//id").text is not None
 
 # test4 delete_сurrency
-@pytest.mark.usefixtures("basic_auth")
-def test_delete_currency(basic_auth, url_currency, new_currency_id):
-    response_delete_currency = requests.delete(url_currency + '/' + str(new_currency_id), auth=basic_auth)
-    assert response_delete_currency.status_code == 204 
+
+@pytest.fixture 
+def url_addresses():
+    return 'http://164.92.218.36:8080/api/addresses'
+
+def test_create_address_to_be_deleted(basic_auth, url_addresses):
+    xml_data_addresses = """
+        <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+            <address>
+                <id_country>525</id_country>
+                <alias>Maria</alias>
+                <lastname>Longreih</lastname>
+                <firstname>Maria</firstname>
+                <address1>Richkova15</address1>
+                <city>Madrid</city>
+            </address>
+        </prestashop>
+    """
+    xml_data_addresses = xml_data_addresses.encode('utf-8')
+    headers = {'Content-Type': 'application/xml'}
+    response_add_address_to_be_deleted = requests.post(url_addresses, data=xml_data_addresses, headers=headers, auth=basic_auth)
+    assert response_add_address_to_be_deleted.status_code == 201
+    added_element = ET.fromstring(response_add_address_to_be_deleted.text)
+    added_element_id = added_element.find(".//id").text
+    assert added_element_id is not None
     
+    url_address_delete = url_addresses + "/" + added_element_id
+    response_delete = requests.delete(url_address_delete, auth=basic_auth)
+    assert response_delete.status_code == 200
+
+
+
 
 
 

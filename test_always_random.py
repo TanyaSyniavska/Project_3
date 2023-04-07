@@ -5,9 +5,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 import random
 import string
+from typing import Tuple
 
 @pytest.fixture(scope='session')
-def basic_auth():
+def basic_auth()-> Tuple[str, str]:
     return HTTPBasicAuth('1VQDHXQ8EF73QTHESPT7UHU9AJQPLXXL', '')
 
 # test_1_get_products
@@ -71,9 +72,9 @@ def test_create_currency(basic_auth):
     assert response_add_currency.status_code == 201
 
  # test4_put_product
-def test_update_product_new():
+def test_update_product_new(basic_auth):
     url = "http://164.92.218.36:8080/api/products"
-    auth = ("1VQDHXQ8EF73QTHESPT7UHU9AJQPLXXL", "")
+    # auth = ("1VQDHXQ8EF73QTHESPT7UHU9AJQPLXXL", "")
     xml_content = """<?xml version="1.0" encoding="UTF-8"?>
     <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
     <order>
@@ -84,7 +85,7 @@ def test_update_product_new():
     </order>
     </prestashop>"""
 
-    response = requests.put(url, auth=auth, data=xml_content)
+    response = requests.put(url, auth=basic_auth, data=xml_content)
 
     assert response.status_code == 200 
 
